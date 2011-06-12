@@ -1,0 +1,105 @@
+=About extension=
+
+In a SPA (single-page-application) the need replacing the group of DOM elements with another set is very common. 
+
+For example: 
+  * Replacing toolbar with inline form.
+  * Showing detail of a item on selection on top of item list etc.
+
+virtualpages extension is aimed to help you in such cases.
+
+==What it does?==
+
+It provides API (pushVirtualPage and popVirtualPage).
+
+==How do you use it?==
+
+Consider your HTML toolbar to be structured as below:
+{{{
+<div class="toolbar">
+	<ul class="menu">
+		<li class="actionitem">
+			<a href="javascript:;" data-action="create">Create</a>
+		</li>
+	</ul>
+</div>
+}}}
+On click of Create you will want to show (which gets created on the fly):
+{{{
+<div class="formitem">
+	<form class="createform">
+		<input type="text">
+		<button>Save</button>
+		<button data-action="cancel">Cancel</button>
+	</form>
+</div>
+}}}
+
+===Suggested approach:===
+
+Modify HTML toolbar structure to group the nodes into default virtualpage.
+{{{
+<div class="toolbar">
+	<div class="virtualpage"> // <!-- Add this wrapper -->
+		<ul class="menu">
+			<li class="actionitem">
+				<a href="javascript:;" data-action="create">Create</a>
+			</li>
+		</ul>
+	</div>
+</div>
+}}}
+
+{{{
+/* Registering the Create click event - use your preferred way */
+$('[data-action="create"]', $('.toolbar')).click(function(e) {
+	e.preventDefault();
+	
+	var target = $(e.currentTarget);
+	var toolbar= target.closest('.toolbar');
+	
+	// Creates a new virtualpage div and hides all others.	
+	var newPage= toolbar.pushVirtualPage(); 
+	
+	/* Use templating like jqote etc… */
+	var newUI  = $('<div class="formitem">' +
+		'<form class="createform">' +
+		'	<input type="text">'  +
+		'	<button>Save</button>'+
+		'	<button data-action="cancel">Cancel</button>'+
+		'</form>'+
+		'</div>');
+		
+	newPage.append(newUI);
+	
+	/* Setup Cancel action - use of popVirtualPage */
+	$('[data-action="cancel"]', newUI).click(function(e) {
+		e.preventDefault();
+		toolbar.popVirtualPage(); // toolbar refers to variable in the outer context.
+	});	
+});
+
+}}}
+
+_Final DOM would look like:_
+{{{
+<div class="toolbar virtualpages">
+	<div class="virtualpage">
+		<ul class="menu">
+			<li class="actionitem">
+				<a href="javascript:;" data-action="create">Create</a>
+			</li>
+		</ul>
+	</div>
+	<div class="virtualpage">
+		<div class="formitem">
+			<form class="createform">
+				<input type="text">
+				<button>Save</button>
+				<button data-action="cancel">Cancel</button>
+			</form>
+		</div>	
+	</div>
+</div>
+}}}
+
