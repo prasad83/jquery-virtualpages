@@ -2,20 +2,24 @@
  * Author: Prasad.A
  * Copyright: You are free to use or modify this extension in commercial and non-commercial application
  * However, make sure to keep the information about this copyright and author information. Provide the
- * credits whereever possible.
+ * credits wherever possible.
  */
 ;(function($){
 	
 	$.fn.pushVirtualPage = function() {
-		// Page generally will be pushed w.r.t root node
+		// Make this element as root node first
 		var holder = this; 
-		// In case the page is pushed w.r.t existing page
-		if (this.hasClass('virtualpage') && this.data('isvirtualpage')) {
-			holder = this.closest('.virtualpages');
-		}
 		holder.removeClass('virtualpages').addClass('virtualpages');
 		
 		var pages = $('.virtualpage', holder);
+		
+		// If its the first page to be added but there are contents
+		// inside this element, wrap it into a page.
+		if (pages.length == 0 && holder.children().length) {
+			var wrappedChild = holder.children().wrap('<div class="virtualpage">');	
+			// rebuild the references		
+			pages = $('.virtualpage', holder);
+		}
 		
 		// Save scroll position
 		var activePage = this.activeVirtualPage();
@@ -34,8 +38,7 @@
 	$.fn.popVirtualPage = function(limit) {
 		// Page generally will be popped off w.r.t root node
 		var holder = this;		
-		// In case page is being popped off directly
-		if (this.hasClass('virtualpage') && this.data('isvirtualpage')) {
+		if (!this.hasClass('virtualpages')) {
 			holder = this.closest('.virtualpages');
 			if (holder.length) return false;
 		}
@@ -72,12 +75,7 @@
 	}
 	
 	$.fn.activeVirtualPage = function() {
-		// Page generally will be pushed w.r.t root node
 		var holder = this; 
-		// In case the page is pushed w.r.t existing page
-		if (this.hasClass('virtualpage') && this.data('isvirtualpage')) {
-			holder = this.closest('.virtualpages');
-		}
 		var activeIndex = parseInt(holder.data('virtualpage-activeindex'));
 		var pages = $('.virtualpage', holder);
 		return $(pages[activeIndex]);
