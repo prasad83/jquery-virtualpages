@@ -49,9 +49,9 @@
 			if (holder.length) return false;
 		}
 		
-		var pages = $('.virtualpage', holder);
+		var pages = holder.children('.virtualpage');
 		if (typeof(limit) == 'undefined') limit = pages.length-1;
-		
+
 		if (pages.length > limit) {
 			pages.hide();			
 			var page = pages[pages.length-1];			
