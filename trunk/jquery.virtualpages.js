@@ -8,16 +8,22 @@
 	
 	$.fn.pushVirtualPage = function() {
 		// Make this element as root node first
-		var holder = this; 
-		holder.removeClass('virtualpages').addClass('virtualpages');
+		var holder = this;		
+		if (!holder.hasClass('virtualpages')) {
+			holder.addClass('virtualpages');
+		}
 		
 		var pages = $('.virtualpage', holder);
 		
 		// If its the first page to be added but there are contents
 		// inside this element, wrap it into a page.
 		if (pages.length == 0 && holder.children().length) {
-			var wrappedChild = holder.children().wrap('<div class="virtualpage">');	
-			// rebuild the references		
+			var wrapper = $('<div class="virtualpage"></div>');			
+			var olderChildrens = holder.children();
+			wrapper.append(olderChildrens.clone(true, true));
+			olderChildrens.remove();
+			holder.empty().append(wrapper);			
+			// rebuild the reference
 			pages = $('.virtualpage', holder);
 		}
 		
